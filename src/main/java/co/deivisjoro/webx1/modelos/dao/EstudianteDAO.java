@@ -73,4 +73,22 @@ public class EstudianteDAO {
     }
     
     
+    public boolean delete(int id){
+        boolean resultado = false;
+        try{
+            String sql = "DELETE FROM estudiantes WHERE id = ?";
+            PreparedStatement pst = this.conexion.getConexion().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            pst.setInt(1, id);
+            int filas = pst.executeUpdate();
+            if(filas>0){
+                resultado = true;
+            }
+            
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        
+        return resultado;        
+    }
 }

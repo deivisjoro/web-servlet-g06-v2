@@ -36,15 +36,53 @@ public class EstudianteServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String salida = "";
-        
         Conexion conexion = new Conexion();
         EstudianteDAO estudianteDAO = new EstudianteDAO(conexion);
-        ArrayList<Estudiante> estudiantes = estudianteDAO.list();
+
+        String opcion = request.getParameter("accion");
         
-        request.setAttribute("estudiantes", estudiantes);
+        opcion = (opcion==null) ? "listar" :  opcion;
         
-        request.getRequestDispatcher("estudiantes.jsp").forward(request, response);
+        
+        if(opcion.equals("ingresar")){
+            boolean ingresar = (request.getParameter("guardar")!=null) ? true :  false;
+            
+            if(ingresar){
+                Estudiante estudiante = new Estudiante();
+                estudiante.setNombre(request.getParameter("nombre"));
+                estudiante.setNota1(Float.parseFloat(request.getParameter("nota1")));
+                estudiante.setNota2(Float.parseFloat(request.getParameter("nota2")));
+                estudiante.setNota3(Float.parseFloat(request.getParameter("nota3")));
+                Estudiante e = estudianteDAO.add(estudiante);
+                
+                response.sendRedirect("estudiantes");
+                
+                /*if(e.getId()!=0){
+                }
+                else{
+                }*/
+            }            
+            else{
+                request.getRequestDispatcher("ingresar.jsp").forward(request, response);
+            }
+            
+        }
+        else if(opcion.equals("eliminar")){
+            
+            int id = (request.getParameter("id")!=null) ? Integer.parseInt(request.getParameter("id")) :  0;
+            System.out.println("El valor de id es "+id);
+            if(id!=0){
+                estudianteDAO.delete(id);
+                response.sendRedirect("estudiantes");
+            }
+        }
+        else{
+            ArrayList<Estudiante> estudiantes = estudianteDAO.list();
+        
+            request.setAttribute("estudiantes", estudiantes);
+
+            request.getRequestDispatcher("estudiantes.jsp").forward(request, response);
+        }
         
         
     }
